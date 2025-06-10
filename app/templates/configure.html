@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Config - Skölays</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styless.css') }}" />
+</head>
+<body>
+    <div class="container_4" style="margin-top: 20px;">
+        <div class="div_1">
+            <img src="{{ url_for('static', filename=current_user.profile_picture_url) }}" alt="Foto de perfil" width="100" class="foto_de_perfil">
+            <input type="file" id="cambiar-foto" style="display: none;">
+            <div class="div_2">
+                <h2 style="color: white;">{{ current_user.username }}</h2>
+                <p>PIN: {{ current_user.pin }}</p>
+                <button class="button" onclick="document.getElementById('cambiar-foto').click()">Cambiar foto</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container_4">
+        <div class="contactos_2">
+            <h3 style="color: white;">Tus contactos</h3>
+                {% for amigo in current_user.friends %}
+                    <form method="POST" action="{{ url_for('main.chats') }}">
+                        <input type="hidden" name="destino" value="{{ amigo.id }}">
+                        <button class="container_1">
+                            <img 
+                            src="{{ url_for('static', filename=amigo.profile_picture_url or 'img/default.png') }}" 
+                            alt="foto de perfil de {{ amigo.username }}" 
+                            class="foto_de_perfil"
+                            >
+                            <h2>{{ amigo.username }}</h2>
+                        </button>
+                    </form>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{{ url_for('main.logout') }}" class="btn">Cerrar sesión</a>
+        <a href="{{ url_for('main.chats') }}" class="btn register-btn">Volver</a>
+    </div>
+<script>
+    document.getElementById("cambiar-foto").addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("foto", file);
+
+        fetch("/subir_foto", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("foto-perfil").src = data.url + "?t=" + new Date().getTime(); // fuerza recarga
+            } else {
+                alert("Error al subir la foto");
+            }
+        });
+    });
+</script>
+</body>
+</html>

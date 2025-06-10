@@ -1,0 +1,55 @@
+from . import db
+from flask_login import UserMixin
+from datetime import datetime
+
+friendship = db.Table('friendship',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('friend_id', db.Integer, db.ForeignKey('user.id'))
+)
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True)
+    email = db.Column(db.String(150), unique=True)
+    password = db.Column(db.String(150))
+    pin = db.Column(db.String(3), unique=True)
+
+    # 🔽 Foto de perfil (nueva columna)
+    profile_picture_url = db.Column(db.String(255), default='/static/foto.png')
+
+    # Relaciones para mensajes enviados y recibidos
+    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', back_populates='sender')
+    received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', back_populates='receiver')
+
+    # Relación de amistades
+    friends = db.relationship(
+        'User',
+        secondary=friendship,
+        primaryjoin=id == friendship.c.user_id,
+        secondaryjoin=id == friendship.c.friend_id,
+        backref='friends_back'
+    )
+
+    def __repr__(self):
+        return f"<User {self.username} ({self.pin})>"
+
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    sender = db.relationship('User', foreign_keys=[sender_id], back_populates='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], back_populates='received_messages')
+
+
+class FriendRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    status = db.Column(db.String(10), default='pending')
+
+    from_user = db.relationship('User', foreign_keys=[from_user_id], backref='sent_requests')
+    to_user = db.relationship('User', foreign_keys=[to_user_id], backref='received_requests')

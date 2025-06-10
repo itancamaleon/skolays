@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Skölays</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+    <div class="container">
+
+        <!-- Mensajes Flash -->
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-messages">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Pantalla de Inicio -->
+        <section id="inicio">
+            <h1>Bienvenido a Skölays 💬</h1>
+            <p>Tu nueva red social para hablar con amigos.</p>
+            <div class="buttons">
+                <button class="btn login-btn" id="btn-login">Iniciar sesión</button>
+                <button class="btn register-btn" id="btn-registrar">Registrarse</button>
+            </div>
+        </section>
+
+        <!-- Formulario de Registro -->
+        <section id="registro" style="display:none;">
+            <h2>Crear una cuenta</h2>
+            <form id="form-registro" method="POST" action="{{ url_for('main.register') }}">
+                <input type="text" name="username" placeholder="Nombre de usuario" required />
+                <input type="email" name="email" placeholder="Correo electrónico" required />
+                <input type="password" name="password" placeholder="Contraseña" required />
+                <button type="submit" class="btn register-btn">Registrar</button>
+            </form>
+            <button class="btn back-btn" id="btn-volver-inicio-1">Volver</button>
+        </section>
+
+        <!-- Formulario de Login -->
+        <section id="login" style="display:none;">
+            <h2>Iniciar sesión</h2>
+            <form id="form-login" method="POST" action="{{ url_for('main.login') }}">
+                <input type="text" name="username_or_email" placeholder="Usuario o correo" required />
+                <input type="password" name="password" placeholder="Contraseña" required />
+                <button type="submit" class="btn login-btn">Entrar</button>
+            </form>
+            <button class="btn back-btn" id="btn-volver-inicio-2">Volver</button>
+        </section>
+
+    </div>
+
+    <!-- JS para cambiar de vista -->
+    <script>
+        const inicio = document.getElementById('inicio');
+        const registro = document.getElementById('registro');
+        const login = document.getElementById('login');
+
+        document.getElementById('btn-registrar').addEventListener('click', () => {
+            inicio.style.display = 'none';
+            registro.style.display = 'block';
+        });
+
+        document.getElementById('btn-login').addEventListener('click', () => {
+            inicio.style.display = 'none';
+            login.style.display = 'block';
+        });
+
+        document.getElementById('btn-volver-inicio-1').addEventListener('click', () => {
+            registro.style.display = 'none';
+            inicio.style.display = 'block';
+        });
+
+        document.getElementById('btn-volver-inicio-2').addEventListener('click', () => {
+            login.style.display = 'none';
+            inicio.style.display = 'block';
+        });
+    </script>
+</body>
+</html>

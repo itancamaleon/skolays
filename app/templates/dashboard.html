@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+    <div class="container">
+        <h1>Hola {{ name }}, bienvenido.</h1>
+        <p>¡Gracias por iniciar sesión en Skölays!</p>
+        <div>
+            <a href="{{ url_for('main.logout') }}" class="btn">Cerrar sesión</a>
+            <a href="{{ url_for('main.chats') }}" class="btn register-btn">Empezar</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,375 @@
+ * {
+    text-decoration: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+}
+
+.button {
+  position: relative;
+  padding: 10px 22px;
+  border-radius: 6px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  background-color: #7d2ae8;
+  transition: all 0.2s ease;
+}
+
+.button:active {
+  transform: scale(0.96);
+}
+
+.button:before,
+.button:after {
+  position: absolute;
+  content: "";
+  width: 150%;
+  left: 50%;
+  height: 100%;
+  transform: translateX(-50%);
+  z-index: -1000;
+  background-repeat: no-repeat;
+}
+
+.button:hover:before {
+  top: -70%;
+  background-image: radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, transparent 20%, #7d2ae8 20%, transparent 30%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, transparent 10%, #7d2ae8 15%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%);
+  background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%,
+    10% 10%, 18% 18%;
+  background-position: 50% 120%;
+  animation: greentopBubbles 0.6s ease;
+}
+
+@keyframes greentopBubbles {
+  0% {
+    background-position: 5% 90%, 10% 90%, 10% 90%, 15% 90%, 25% 90%, 25% 90%,
+      40% 90%, 55% 90%, 70% 90%;
+  }
+
+  50% {
+    background-position: 0% 80%, 0% 20%, 10% 40%, 20% 0%, 30% 30%, 22% 50%,
+      50% 50%, 65% 20%, 90% 30%;
+  }
+
+  100% {
+    background-position: 0% 70%, 0% 10%, 10% 30%, 20% -10%, 30% 20%, 22% 40%,
+      50% 40%, 65% 10%, 90% 20%;
+    background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+  }
+}
+
+.button:hover::after {
+  bottom: -70%;
+  background-image: radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, transparent 10%, #7d2ae8 15%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%),
+    radial-gradient(circle, #7d2ae8 20%, transparent 20%);
+  background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 20% 20%, 18% 18%;
+  background-position: 50% 0%;
+  animation: greenbottomBubbles 0.6s ease;
+}
+
+@keyframes greenbottomBubbles {
+  0% {
+    background-position: 10% -10%, 30% 10%, 55% -10%, 70% -10%, 85% -10%,
+      70% -10%, 70% 0%;
+  }
+
+  50% {
+    background-position: 0% 80%, 20% 80%, 45% 60%, 60% 100%, 75% 70%, 95% 60%,
+      105% 0%;
+  }
+
+  100% {
+    background-position: 0% 90%, 20% 90%, 45% 70%, 60% 110%, 75% 80%, 95% 70%,
+      110% 10%;
+    background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+  }
+}
+
+.main_1 {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: white;
+    text-align: center;
+    margin: 0px 8px 0px 8px;
+    display: flex;
+    height: 150px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 10px;
+}
+
+.container, .container_2, .container_3{
+    background-color: #1e1e1e;
+    padding: 10px 60px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin: 20xp 0px;
+}
+
+p {
+    font-size: 1.1rem;
+    color: #ccc;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    background-color: #3b82f6;
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #2563eb;
+}
+
+.register-btn {
+    background-color: #10b981;
+}
+
+.register-btn:hover {
+    background-color: #0f766e;
+}
+form {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    padding: 6px 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    box-shadow: 0 0 5px #3b82f6;
+}
+
+.div_1 {
+    display: flex;
+    align-items: center;
+}
+
+.div_2 {
+    margin-left: 30px;
+}
+.input {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
+  font-weight: 500;
+  font-size: .8vw;
+  color: #fff;
+  background-color: rgb(28,28,30);
+  box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
+  border-radius: 0.4vw;
+  border: none;
+  outline: none;
+  padding: 0.4vw;
+  max-width: 190px;
+  transition: .4s;
+}
+
+.input:hover {
+  box-shadow: 0 0 0 .15vw rgba(135, 207, 235, 0.186);
+}
+
+.input:focus {
+  box-shadow: 0 0 0 .15vw skyblue;
+}
+
+.container_1 {
+    margin-top: 10px;
+    color: white;
+    background-color: #121212;
+    padding: 14px 200px 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    display: flex;
+    border: none;
+    height: 80px;
+    width: 300px;
+}
+
+.container_1:hover {
+    background-color: #1e1e1e;
+    cursor: pointer;
+}
+
+.foto_de_perfil {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: solid 1px;
+}
+
+.main_2{
+    display: flex;
+    width: 100%;
+    margin-right: 10px;
+    height: 37pc;
+}
+
+/*.container_2 {
+    margin: 10px 0px 0px 10px;
+    background-color: #121212;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+}
+
+.mensaje_1 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}*/
+
+.mensaje_1 {
+  clear: both;                 /* fuerza que el mensaje se muestre en una nueva línea */
+  float: right;                /* mensaje del usuario, a la derecha */
+  padding: 10px 15px;
+  border-radius: 15px 15px 0 15px;
+  max-width: 60%;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+}
+
+.mensaje_2 {
+  clear: both;                 /* fuerza nueva línea */
+  float: left;                 /* mensaje del amigo, a la izquierda */
+  padding: 10px 15px;
+  border-radius: 15px 15px 15px 0;
+  max-width: 60%;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+}
+
+.mensaje_2{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.mensaje {
+    margin-top:4px ;
+    padding: 4px;
+    border-radius: 8px;
+    background-color: #2e2d2d;
+}
+
+.container_3{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 40pc;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+ul {
+    display: flex;
+    margin: 4px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+li {
+    margin-top: 10px;
+}
+
+.mensaje-estilo {
+    margin-top: 4px;
+    padding: 4px;
+    border-radius: 8px;
+    background-color: #2e2d2d;
+    color: white;
+}
+
+#mensajes {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.container_2 {
+    margin: 10px 0px 10px 10px;
+    background-color: #1e1e1e;
+    padding: 66px 60px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    width: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: stretch;
+}
+
+.div_4 {
+    display: flex;
+    margin-bottom:10px ;
+}
+
+.container_4{
+    margin: 10px;
+    background-color: #1e1e1e;
+    padding: 10px 60px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.contactos_1{
+    width: 34pc;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.contactos_2 {
+    width: auto;
+    overflow-y: auto;
+    padding: 10px;
+    max-height: 26pc;
+}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chats - Skölays</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styless.css') }}" />
+</head>
+<body>
+    <main class="main_1">
+        <div class="container">
+            <h1>Skolays</h1>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                {% endwith %}
+            <div class="div_1">
+                <form method="POST" action="{{ url_for('main.send_friend_request') }}">
+                    <input type="text" name="friend_pin" class="input" placeholder="Buscar amigos por PIN" maxlength="3" required>
+                    <button type="submit" class="btn">Agregar</button>
+                </form>
+                <div class="div_2">
+                    <a href="{{ url_for('main.solicitudes') }}" class="btn">Solicitudes</a>
+                    <a href="{{ url_for('main.configure') }}" class="btn">Configuraciones</a>
+                </div>
+            </div>
+        </div>
+
+        <main class="main_2">
+            <!-- Contactos -->
+            <div class="contactos_1">
+                <form method="POST" action="{{ url_for('main.chats') }}">
+                    <input type="hidden" name="destino" value="{{ current_user.id }}">
+                    <button class="container_1">
+                        <img src="{{ url_for('static', filename=current_user.profile_picture_url) }}" alt="Foto de perfil" width="100" class="foto_de_perfil">
+                        <h2>Tú</h2>
+                    </button>
+                </form>
+
+                {% for amigo in current_user.friends %}
+                    <form method="POST" action="{{ url_for('main.chats') }}">
+                        <input type="hidden" name="destino" value="{{ amigo.id }}">
+                        <button class="container_1">
+                            <img 
+                            src="{{ url_for('static', filename=amigo.profile_picture_url or 'img/default.png') }}" 
+                            alt="foto de perfil de {{ amigo.username }}" 
+                            class="foto_de_perfil"
+                            >
+                            <h2>{{ amigo.username }}</h2>
+                        </button>
+                    </form>
+                {% endfor %}
+            </div>
+            <!-- Chats -->
+            <section class="container_2">
+                <!-- Formulario para enviar nuevo mensaje -->
+                <div class="div_3">
+                    <form id="chat-form">
+                        <input type="hidden" id="destino" value="{{ destino.id if destino else '' }}">
+                        <input type="text" id="mensaje" placeholder="Escribe tu mensaje" required class="input">
+                        <button type="submit" class="btn">Enviar</button>
+                    </form>
+                </div>
+                <!-- Mensajes -->
+                <div id="mensajes">
+                    {% for mensaje in mensajes %}
+                        <div class="mensaje mensaje-estilo {% if mensaje.sender_id == current_user.id %}mensaje_1{% else %}mensaje_2{% endif %}">
+                            {{ mensaje.content }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="div_4">
+                    <h2>{{ destino.username }}</h2>
+                </div>
+            </section>
+        </main>
+    </main>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        const senderId = "{{ current_user.id }}";
+        const receiverId = "{{ destino.id }}";
+        const receiverName = "{{ destino.username }}";
+        const room = `${Math.min(senderId, receiverId)}-${Math.max(senderId, receiverId)}`;
+
+        function scrollToBottom() {
+            const container = document.getElementById("mensajes");
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        socket.emit('join', { room });
+
+        document.getElementById("chat-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const messageInput = document.getElementById("mensaje");
+            const message = messageInput.value;
+            if (message.trim() === "") return;
+
+            socket.emit('send_message', {
+                sender_id: senderId,
+                receiver_id: receiverId,
+                message: message,
+                room: room
+            });
+
+            addMessage("Tú", message);
+            messageInput.value = "";
+            scrollToBottom();
+        });
+
+        socket.on("receive_message", function(data) {
+            if (String(data.sender_id) !== String(senderId)) {
+                addMessage(receiverName, data.message);
+                scrollToBottom();
+            }
+        });
+
+        function addMessage(user, message) {
+            const container = document.getElementById("mensajes");
+            const div = document.createElement("div");
+
+            const isSender = user === "Tú";
+            div.classList.add("mensaje-estilo", isSender ? "mensaje_1" : "mensaje_2");
+
+            div.textContent = message; // Solo el texto
+            container.appendChild(div);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            scrollToBottom();
+            setTimeout(scrollToBottom, 100);
+        });
+        
+    </script>
+</body>
+</html>

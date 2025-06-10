@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Solicitudes de amistad - Skölays</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styless.css') }}" />
+</head>
+<body>
+    <main class="main_1">
+        <div class="container_3">
+            <h1>Solicitudes de amistad</h1>
+
+            {% if solicitudes %}
+                <ul>
+                {% for solicitud in solicitudes %}
+                    <li>
+                        <strong>{{ solicitud.from_user.username }}</strong> 
+                        (PIN: {{ solicitud.from_user.pin }})
+                        <form method="POST" action="{{ url_for('main.responder_solicitud', solicitud_id=solicitud.id) }}" style="display:inline;">
+                            <button name="accion" value="aceptar" type="submit" class="button">Aceptar</button>
+                            <button name="accion" value="rechazar" type="submit" class="button">Rechazar</button>
+                        </form>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No tienes solicitudes de amistad pendientes.</p>
+            {% endif %}
+
+            <a href="{{ url_for('main.chats') }}" class="btn">Volver</a>
+        </div>
+    </main>
+</body>
+</html>

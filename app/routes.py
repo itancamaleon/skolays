@@ -1,14 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
-from .models import Message  # asegúrate de importar Message
+from .models import Message
 from .models import User
 from .models import User, FriendRequest
 from . import db
 
 main = Blueprint('main', __name__)
 
-# Diccionario para guardar mensajes temporales por usuario
 user_messages = {}
 
 @main.route('/')
@@ -28,7 +27,6 @@ def register():
         flash('El usuario o correo ya está registrado.')
         return redirect(url_for('main.index'))
 
-    # Generar el siguiente PIN libre de 000 a 999
     existing_pins = {u.pin for u in User.query.all() if u.pin}
     for i in range(1000):
         new_pin = f"{i:03}"
@@ -163,7 +161,6 @@ def responder_solicitud(solicitud_id):
     if accion == 'aceptar':
         solicitud.status = 'accepted'
 
-        # Agregar amistad mutua
         solicitud.from_user.friends.append(solicitud.to_user)
         solicitud.to_user.friends.append(solicitud.from_user)
 
@@ -192,17 +189,13 @@ def subir_foto():
     if archivo.filename == '':
         return jsonify(success=False, message='Archivo sin nombre'), 400
 
-    # Nombre seguro para evitar conflictos
     nombre_archivo = secure_filename(f"{current_user.id}_foto.png")
     ruta_foto = os.path.join(current_app.root_path, 'static', 'perfil', nombre_archivo)
 
-    # Crear carpeta si no existe
     os.makedirs(os.path.dirname(ruta_foto), exist_ok=True)
 
-    # Guardar archivo
     archivo.save(ruta_foto)
 
-    # Guardar ruta relativa en base de datos (sin url_for)
     current_user.profile_picture_url = f'perfil/{nombre_archivo}'
     db.session.commit()
 

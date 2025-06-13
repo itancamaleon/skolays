@@ -15,6 +15,8 @@
                 <h2 style="color: white;">{{ current_user.username }}</h2>
                 <p>PIN: {{ current_user.pin }}</p>
                 <button class="button" onclick="document.getElementById('cambiar-foto').click()">Cambiar foto</button>
+
+                <button onclick="mostrarFormularioGrupo()" class="button">Crear grupo</button>
             </div>
         </div>
     </div>
@@ -37,6 +39,20 @@
                 {% endfor %}
             </ul>
         </div>
+        <div id="formulario-grupo" style="display: none; background: #222; padding: 15px; border-radius: 10px; margin-top: 20px;">
+            <form method="POST" action="{{ url_for('main.crear_grupo') }}">
+                <label style="color: white;">Nombre del grupo:</label>
+                <input type="text" name="nombre_grupo" class="input" required>
+
+                <label style="color: white;">Selecciona miembros:</label><br>
+                {% for amigo in current_user.friends %}
+                    <input type="checkbox" name="miembros" value="{{ amigo.id }}"> {{ amigo.username }}<br>
+                {% endfor %}
+                
+                <button type="submit" class="btn">Crear</button>
+            </form>
+        </div>
+
     </div>
 
     <div style="text-align: center; margin-top: 30px;">
@@ -58,12 +74,16 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                document.getElementById("foto-perfil").src = data.url + "?t=" + new Date().getTime(); // fuerza recarga
+                document.getElementById("foto-perfil").src = data.url + "?t=" + new Date().getTime();
             } else {
                 alert("Error al subir la foto");
             }
         });
     });
+    function mostrarFormularioGrupo() {
+        const form = document.getElementById("formulario-grupo");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    }
 </script>
 </body>
 </html>

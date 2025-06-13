@@ -5,6 +5,12 @@ from .models import Message
 from .models import User
 from .models import User, FriendRequest
 from . import db
+from flask import request, jsonify, current_app
+from flask_login import current_user, login_required
+import os
+from werkzeug.utils import secure_filename
+from .models import Group, GroupMember, Message 
+from sqlalchemy import or_
 
 main = Blueprint('main', __name__)
 
@@ -71,32 +77,57 @@ def solicitudes():
 @main.route('/chats', methods=['GET', 'POST'])
 @login_required
 def chats():
-    destino_id = request.form.get('destino') or request.args.get('destino')
+    destino_raw = request.form.get('destino') or request.args.get('destino')
+    es_grupo = False
+    mensajes = []
+    destino = None
 
-    if not destino_id:
-        return render_template('chats.html', mensajes=[], destino=None)
+    grupos = [gm.group for gm in current_user.group_memberships]
 
-    destino = User.query.get_or_404(destino_id)
+    if not destino_raw:
+        return render_template('chats.html', mensajes=[], destino=None, grupos=grupos, es_grupo=False)
 
-    if request.method == 'POST' and 'mensaje' in request.form:
-        mensaje = request.form['mensaje']
-        new_message = Message(
-            sender_id=current_user.id,
-            receiver_id=destino.id,
-            content=mensaje
-        )
-        db.session.add(new_message)
-        db.session.commit()
-        return redirect(url_for('main.chats', destino=destino.id))
+    if str(destino_raw).startswith("grupo_"):
+        grupo_id = int(destino_raw.split("_")[1])
+        destino = Group.query.get_or_404(grupo_id)
+        es_grupo = True
 
-    # Obtener mensajes entre los dos usuarios
-    mensajes = Message.query.filter(
-        ((Message.sender_id == current_user.id) & (Message.receiver_id == destino.id)) |
-        ((Message.sender_id == destino.id) & (Message.receiver_id == current_user.id))
-    ).order_by(Message.timestamp.asc()).all()
+        if request.method == 'POST' and 'mensaje' in request.form:
+            mensaje = request.form['mensaje']
+            group_msg = Message(
+                sender_id=current_user.id,
+                group_id=destino.id,
+                content=mensaje
+            )
+            db.session.add(group_msg)
+            db.session.commit()
+            return redirect(url_for('main.chats', destino=f"grupo_{destino.id}"))
 
-    return render_template('chats.html', mensajes=mensajes, destino=destino)
+        mensajes = Message.query.filter_by(group_id=grupo_id).order_by(Message.timestamp.asc()).all()
 
+    else:
+        destino_id = int(destino_raw)
+        destino = User.query.get_or_404(destino_id)
+
+        if request.method == 'POST' and 'mensaje' in request.form:
+            mensaje = request.form['mensaje']
+            new_message = Message(
+                sender_id=current_user.id,
+                receiver_id=destino.id,
+                content=mensaje
+            )
+            db.session.add(new_message)
+            db.session.commit()
+            return redirect(url_for('main.chats', destino=destino.id))
+
+        mensajes = Message.query.filter(
+            or_(
+                (Message.sender_id == current_user.id) & (Message.receiver_id == destino.id),
+                (Message.sender_id == destino.id) & (Message.receiver_id == current_user.id)
+            )
+        ).order_by(Message.timestamp.asc()).all()
+
+    return render_template('chats.html', mensajes=mensajes, destino=destino, grupos=grupos, es_grupo=es_grupo)
 
 @main.route('/aceptar_solicitud/<int:request_id>')
 @login_required
@@ -105,7 +136,7 @@ def aceptar_solicitud(request_id):
     if solicitud.to_user == current_user and solicitud.status == 'pending':
         solicitud.status = 'accepted'
         current_user.friends.append(solicitud.from_user)
-        solicitud.from_user.friends.append(current_user)  # amistad mutua
+        solicitud.from_user.friends.append(current_user)
         db.session.commit()
     return redirect(url_for('main.solicitudes'))
 
@@ -135,7 +166,6 @@ def send_friend_request():
         flash('No puedes enviarte solicitud a ti mismo.')
         return redirect(url_for('main.chats'))
 
-    # Verificar si ya existe la solicitud
     existing = FriendRequest.query.filter_by(from_user_id=current_user.id, to_user_id=user_to.id).first()
     if existing:
         flash('Ya enviaste una solicitud a este usuario.')
@@ -174,11 +204,6 @@ def responder_solicitud(solicitud_id):
     db.session.commit()
     return redirect(url_for('main.solicitudes'))
 
-from flask import request, jsonify, current_app
-from flask_login import current_user, login_required
-import os
-from werkzeug.utils import secure_filename
-
 @main.route('/subir_foto', methods=['POST'])
 @login_required
 def subir_foto():
@@ -200,3 +225,27 @@ def subir_foto():
     db.session.commit()
 
     return jsonify(success=True, url=url_for('static', filename=current_user.profile_picture_url))
+
+@main.route('/crear_grupo', methods=['POST'])
+@login_required
+def crear_grupo():
+    nombre = request.form.get('nombre_grupo')
+    miembros_ids = request.form.getlist('miembros')
+
+    if not nombre or not miembros_ids:
+        flash("Debes dar un nombre y al menos un miembro.")
+        return redirect(url_for('main.configure'))
+
+    from .models import Group, GroupMember
+    nuevo_grupo = Group(name=nombre, admin_id=current_user.id)
+    db.session.add(nuevo_grupo)
+    db.session.commit()
+
+    miembros_ids.append(str(current_user.id))
+
+    for miembro_id in miembros_ids:
+        db.session.add(GroupMember(group_id=nuevo_grupo.id, user_id=miembro_id))
+
+    db.session.commit()
+    flash("Grupo creado con éxito.")
+    return redirect(url_for('main.configure'))

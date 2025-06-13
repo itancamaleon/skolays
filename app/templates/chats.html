@@ -8,7 +8,7 @@
 <body>
     <main class="main_1">
         <div class="container">
-            <h1>Skolays</h1>
+            <h1>Skölays</h1>
                 {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     <ul class="flashes">
@@ -25,7 +25,7 @@
                 </form>
                 <div class="div_2">
                     <a href="{{ url_for('main.solicitudes') }}" class="btn">Solicitudes</a>
-                    <a href="{{ url_for('main.configure') }}" class="btn">Configuraciones</a>
+                    <a href="{{ url_for('main.configure') }}" class="btn">Opciones</a>
                 </div>
             </div>
         </div>
@@ -40,6 +40,16 @@
                         <h2>Tú</h2>
                     </button>
                 </form>
+
+                {% for grupo in grupos %}
+                    <form method="POST" action="{{ url_for('main.chats') }}">
+                        <input type="hidden" name="destino" value="grupo_{{ grupo.id }}">
+                        <button class="container_1">
+                            <img src="{{ url_for('static', filename='grupo.png') }}" alt="Grupo" width="100" class="foto_de_perfil">
+                            <h2>{{ grupo.name }}</h2>
+                        </button>
+                    </form>
+                {% endfor %}
 
                 {% for amigo in current_user.friends %}
                     <form method="POST" action="{{ url_for('main.chats') }}">
@@ -59,9 +69,86 @@
             <section class="container_2">
                 <div class="div_3">
                     <form id="chat-form">
+                        {% if es_grupo %}
+                            <input type="hidden" id="es_grupo" value="1">
+                            <input type="hidden" id="grupo_id" value="{{ destino.id }}">
+                        {% else %}
+                            <input type="hidden" id="es_grupo" value="0">
+                            <input type="hidden" id="receiver_id" value="{{ destino.id }}">
+                        {% endif %}
+
+                        <input type="file" id="imagen" style="display: none;">
+                        <label class="btn" style="padding: 0px; display: flex; justify-content: center;" for="imagen">
+                            <img style="width: 40px;" src="../static/img/camarera.png" alt="">
+                        </label>
+                        <button type="button" id="emojis" class="btn" style="padding: 10px;" >😃</button>
+
+                        <div style="display: none;" id="emoji-panel">
+                            <span class="emoji">😀</span>
+                            <span class="emoji">😃</span>
+                            <span class="emoji">😄</span>
+                            <span class="emoji">😁</span>
+                            <span class="emoji">😆</span>
+                            <span class="emoji">😅</span>
+                            <span class="emoji">😂</span>
+                            <span class="emoji">🤣</span>
+                            <span class="emoji">😊</span>
+                            <span class="emoji">😇</span>
+                            <span class="emoji">😉</span>
+                            <span class="emoji">😌</span>
+                            <span class="emoji">😍</span>
+                            <span class="emoji">🥰</span>
+                            <span class="emoji">😘</span>
+                            <span class="emoji">😗</span>
+                            <span class="emoji">😙</span>
+                            <span class="emoji">😚</span>
+                            <span class="emoji">😋</span>
+                            <span class="emoji">😛</span>
+                            <span class="emoji">😝</span>
+                            <span class="emoji">😜</span>
+                            <span class="emoji">🤪</span>
+                            <span class="emoji">🤨</span>
+                            <span class="emoji">🧐</span>
+                            <span class="emoji">🤓</span>
+                            <span class="emoji">😎</span>
+                            <span class="emoji">😏</span>
+                            <span class="emoji">😒</span>
+                            <span class="emoji">😞</span>
+                            <span class="emoji">😔</span>
+                            <span class="emoji">😟</span>
+                            <span class="emoji">😕</span>
+                            <span class="emoji">🙁</span>
+                            <span class="emoji">☹️</span>
+                            <span class="emoji">😣</span>
+                            <span class="emoji">😖</span>
+                            <span class="emoji">😫</span>
+                            <span class="emoji">😩</span>
+                            <span class="emoji">😢</span>
+                            <span class="emoji">😭</span>
+                            <span class="emoji">🍎</span>
+                            <span class="emoji">🍊</span>
+                            <span class="emoji">🍌</span>
+                            <span class="emoji">🍉</span>
+                            <span class="emoji">🍇</span>
+                            <span class="emoji">🍓</span>
+                            <span class="emoji">🥝</span>
+                            <span class="emoji">🍍</span>
+                            <span class="emoji">🥥</span>
+                            <span class="emoji">🍒</span>
+                            <span class="emoji">😺</span>
+                            <span class="emoji">😸</span>
+                            <span class="emoji">😹</span>
+                            <span class="emoji">😻</span>
+                            <span class="emoji">😼</span>
+                            <span class="emoji">😽</span>
+                            <span class="emoji">🙀</span>
+                            <span class="emoji">😿</span>
+                            <span class="emoji">😾</span>
+                        </div>
+
                         <input type="hidden" id="destino" value="{{ destino.id if destino else '' }}">
                         <input type="text" id="mensaje" placeholder="Escribe tu mensaje" required class="input">
-                        <input type="file" id="imagen">
+                        
                         <button type="submit" class="btn">Enviar</button>
                     </form>
                 </div>
@@ -69,114 +156,154 @@
                 <div id="mensajes">
                     {% for mensaje in mensajes %}
                         <div class="mensaje mensaje-estilo {% if mensaje.sender_id == current_user.id %}mensaje_1{% else %}mensaje_2{% endif %}">
-                            {% if mensaje.content %}
-                                <p>{{ mensaje.content }}</p>
-                            {% endif %}
                             
+                            {% if mensaje.content %}
+                                {% if es_grupo and mensaje.sender_id != current_user.id %}
+                                    <p><strong>{{ mensaje.sender.username }}:</strong> {{ mensaje.content }}</p>
+                                {% else %}
+                                    <p>{{ mensaje.content }}</p>
+                                {% endif %}
+                            {% endif %}
+
                             {% if mensaje.image_url %}
                                 <img src="{{ mensaje.image_url }}" alt="imagen enviada" style="max-width: 200px; display: block;">
                             {% endif %}
                         </div>
                     {% endfor %}
                 </div>
-                <div class="div_4">
+
+            <div class="div_4">
+                {% if es_grupo %}
+                    <h2>{{ destino.name }}</h2>
+                {% else %}
                     <h2>{{ destino.username }}</h2>
-                </div>
+                {% endif %}
+            </div>
             </section>
         </main>
     </main>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    <script>
-        const socket = io();
+<script>
+    const socket = io();
 
-        const senderId = "{{ current_user.id }}";
-        const receiverId = "{{ destino.id }}";
-        const receiverName = "{{ destino.username }}";
-        const room = `${Math.min(senderId, receiverId)}-${Math.max(senderId, receiverId)}`;
+    const senderId = "{{ current_user.id }}";
+    const receiverId = "{{ destino.id }}";
+    const receiverName = "{{ destino.username }}";
+    const esGrupo = document.getElementById("es_grupo").value === "1";
+    const grupoId = document.getElementById("grupo_id")?.value;
 
-        function scrollToBottom() {
-            const container = document.getElementById("mensajes");
-            container.scrollTop = container.scrollHeight;
+    const room = esGrupo ? grupoId : `${Math.min(senderId, receiverId)}-${Math.max(senderId, receiverId)}`;
+
+    function scrollToBottom() {
+        const container = document.getElementById("mensajes");
+        container.scrollTop = container.scrollHeight;
+    }
+
+    socket.emit('join', { room });
+
+    document.getElementById("chat-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const messageInput = document.getElementById("mensaje");
+        const imageInput = document.getElementById("imagen");
+
+        const message = messageInput.value.trim();
+        const image = imageInput.files[0];
+
+        if (!message && !image) return;
+
+        const data = {
+            sender_id: senderId,
+            message: message,
+            room: room
+        };
+
+        if (esGrupo) {
+            data.group_id = grupoId;
+        } else {
+            data.receiver_id = receiverId;
         }
-        
-        socket.emit('join', { room });
 
-        document.getElementById("chat-form").addEventListener("submit", function(e) {
-            e.preventDefault();
-
-            const messageInput = document.getElementById("mensaje");
-            const imageInput = document.getElementById("imagen");
-
-            const message = messageInput.value.trim();
-            const image = imageInput.files[0];
-
-            if (!message && !image) return; // nada que enviar
-
-            const data = {
-                sender_id: senderId,
-                receiver_id: receiverId,
-                message: message,
-                room: room
-            };
-
-            if (image) {
-                const reader = new FileReader();
-                reader.onload = function () {
-                    data.image = reader.result;
-                    socket.emit('send_message', data);
-
-                    // Mostrar el mensaje tú
-                    addMessage("Tú", message, URL.createObjectURL(image));
-                    messageInput.value = "";
-                    imageInput.value = "";
-                    scrollToBottom();
-                };
-                reader.readAsDataURL(image);
-            } else {
+        if (image) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                data.image = reader.result;
                 socket.emit('send_message', data);
-                addMessage("Tú", message);
+
+                addMessage("Tú", message, URL.createObjectURL(image));
                 messageInput.value = "";
+                imageInput.value = "";
                 scrollToBottom();
+            };
+            reader.readAsDataURL(image);
+        } else {
+            socket.emit('send_message', data);
+            addMessage("Tú", message);
+            messageInput.value = "";
+            scrollToBottom();
+        }
+    });
+
+    socket.on("receive_message", function(data) {
+        if (String(data.sender_id) !== String(senderId)) {
+            const nombreMostrar = esGrupo ? data.sender_username : receiverName;
+            addMessage(nombreMostrar, data.message, data.image || null);
+            scrollToBottom();
+        }
+    });
+
+    function addMessage(user, message, imageURL = null) {
+        const container = document.getElementById("mensajes");
+        const div = document.createElement("div");
+
+        const isSender = user === "Tú";
+        div.classList.add("mensaje-estilo", isSender ? "mensaje_1" : "mensaje_2");
+
+        if (message) {
+            const content = document.createElement("p");
+
+            // Mostrar nombre solo en grupos y si no es el remitente
+            if (esGrupo && !isSender) {
+                const strong = document.createElement("strong");
+                strong.textContent = `${user}: `;
+                content.appendChild(strong);
             }
-        });
 
-        socket.on("receive_message", function(data) {
-            if (String(data.sender_id) !== String(senderId)) {
-                addMessage(receiverName, data.message, data.image || null);
-                scrollToBottom();
-            }
-        });
-
-        function addMessage(user, message, imageURL = null) {
-            const container = document.getElementById("mensajes");
-            const div = document.createElement("div");
-
-            const isSender = user === "Tú";
-            div.classList.add("mensaje-estilo", isSender ? "mensaje_1" : "mensaje_2");
-
-            if (message) {
-                const content = document.createElement("p");
-                content.textContent = message;
-                div.appendChild(content);
-            }
-
-            if (imageURL) {
-                const img = document.createElement("img");
-                img.src = imageURL;
-                img.style.maxWidth = "325px";
-                img.style.minWidth = "200px";
-                img.style.display = "block";
-                div.appendChild(img);
-            }
-
-            container.appendChild(div);
+            content.appendChild(document.createTextNode(message));
+            div.appendChild(content);
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            scrollToBottom();
-            setTimeout(scrollToBottom, 100);
+        if (imageURL) {
+            const img = document.createElement("img");
+            img.src = imageURL;
+            img.style.maxWidth = "325px";
+            img.style.minWidth = "200px";
+            img.style.display = "block";
+            div.appendChild(img);
+        }
+
+        container.appendChild(div);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        scrollToBottom();
+        setTimeout(scrollToBottom, 100);
+    });
+
+    document.getElementById("emojis").addEventListener("click", function() {
+        const panel = document.getElementById("emoji-panel");
+        panel.style.display = panel.style.display === "none" ? "block" : "none";
+    });
+
+    document.querySelectorAll("#emoji-panel .emoji").forEach(function(el) {
+        el.addEventListener("click", function() {
+            const mensajeInput = document.getElementById("mensaje");
+            mensajeInput.value += el.textContent;
+            mensajeInput.focus();
+            document.getElementById("emoji-panel").style.display = "none";
         });
-        
-    </script>
+    });
+</script>
+
 </body>
 </html>

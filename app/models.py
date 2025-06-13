@@ -31,11 +31,12 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f"<User {self.username} ({self.pin})>"
 
-
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True)
+    group = db.relationship('Group', back_populates='messages')
     content = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(255), nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
@@ -43,6 +44,7 @@ class Message(db.Model):
     sender = db.relationship('User', foreign_keys=[sender_id], back_populates='sent_messages')
     receiver = db.relationship('User', foreign_keys=[receiver_id], back_populates='received_messages')
 
+    group = db.relationship('Group', back_populates='messages') 
 
 class FriendRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,3 +54,21 @@ class FriendRequest(db.Model):
 
     from_user = db.relationship('User', foreign_keys=[from_user_id], backref='sent_requests')
     to_user = db.relationship('User', foreign_keys=[to_user_id], backref='received_requests')
+
+class Group(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    admin_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    admin = db.relationship('User', backref='admin_groups')
+    messages = db.relationship('Message', back_populates='group', cascade="all, delete-orphan")
+    members = db.relationship('GroupMember', back_populates='group', cascade="all, delete-orphan")
+
+class GroupMember(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    group = db.relationship('Group', back_populates='members')
+    user = db.relationship('User', backref='group_memberships')

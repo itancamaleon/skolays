@@ -19,7 +19,6 @@ def handle_send_message(data):
     message = data['message']
     room = data['room']
     sender_id = data['sender_id']
-    receiver_id = data['receiver_id']
     image_data = data.get('image')
 
     image_url = None
@@ -29,7 +28,6 @@ def handle_send_message(data):
         ext = header.split('/')[1].split(';')[0]
         filename = f"{uuid.uuid4()}.{ext}"
         folder_path = os.path.join(current_app.root_path, 'static', 'img', 'uploads')
-
         os.makedirs(folder_path, exist_ok=True)
         file_path = os.path.join(folder_path, filename)
 
@@ -38,23 +36,45 @@ def handle_send_message(data):
 
         image_url = f"/static/img/uploads/{filename}"
 
-    new_message = Message(
-        sender_id=sender_id,
-        receiver_id=receiver_id,
-        content=message,
-        image_url=image_url
-    )
-    db.session.add(new_message)
-    db.session.commit()
+    group_id = data.get('group_id')
+    receiver_id = data.get('receiver_id')
 
-    emit('receive_message', {
-        'message': message,
-        'sender_id': sender_id,
-        'receiver_id': receiver_id,
-        'image': image_url
-    }, room=room)
+    if group_id:
+        new_message = Message(
+            sender_id=sender_id,
+            group_id=group_id,
+            content=message,
+            image_url=image_url
+        )
+        db.session.add(new_message)
+        db.session.commit()
 
-    emit('desktop_notification', {
-        'title': f"Nuevo mensaje de {current_user.username}",
-        'body': message if message else "📷 Imagen enviada"
-    }, room=f"user_{receiver_id}")
+        emit('receive_message', {
+            'message': message,
+            'sender_id': sender_id,
+            'sender_username': current_user.username,
+            'group_id': group_id,
+            'image': image_url
+        }, room=room)
+
+    else:
+        new_message = Message(
+            sender_id=sender_id,
+            receiver_id=receiver_id,
+            content=message,
+            image_url=image_url
+        )
+        db.session.add(new_message)
+        db.session.commit()
+
+        emit('receive_message', {
+            'message': message,
+            'sender_id': sender_id,
+            'receiver_id': receiver_id,
+            'image': image_url
+        }, room=room)
+
+        emit('desktop_notification', {
+            'title': f"Nuevo mensaje de {current_user.username}",
+            'body': message if message else "📷 Imagen enviada"
+        }, room=f"user_{receiver_id}")

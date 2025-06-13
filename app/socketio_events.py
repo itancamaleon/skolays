@@ -2,6 +2,10 @@ from flask_socketio import emit, join_room
 from flask_login import current_user
 from . import socketio
 from .models import Message, db
+import os
+import base64
+import uuid
+from flask import current_app
 
 @socketio.on('join')
 def handle_join(data):
@@ -16,11 +20,29 @@ def handle_send_message(data):
     room = data['room']
     sender_id = data['sender_id']
     receiver_id = data['receiver_id']
+    image_data = data.get('image')
+
+    image_url = None
+
+    if image_data:
+        header, encoded = image_data.split(',', 1)
+        ext = header.split('/')[1].split(';')[0]
+        filename = f"{uuid.uuid4()}.{ext}"
+        folder_path = os.path.join(current_app.root_path, 'static', 'img', 'uploads')
+
+        os.makedirs(folder_path, exist_ok=True)
+        file_path = os.path.join(folder_path, filename)
+
+        with open(file_path, "wb") as f:
+            f.write(base64.b64decode(encoded))
+
+        image_url = f"/static/img/uploads/{filename}"
 
     new_message = Message(
         sender_id=sender_id,
         receiver_id=receiver_id,
-        content=message
+        content=message,
+        image_url=image_url
     )
     db.session.add(new_message)
     db.session.commit()
@@ -28,10 +50,11 @@ def handle_send_message(data):
     emit('receive_message', {
         'message': message,
         'sender_id': sender_id,
-        'receiver_id': receiver_id
+        'receiver_id': receiver_id,
+        'image': image_url
     }, room=room)
 
     emit('desktop_notification', {
         'title': f"Nuevo mensaje de {current_user.username}",
-        'body': message
+        'body': message if message else "📷 Imagen enviada"
     }, room=f"user_{receiver_id}")

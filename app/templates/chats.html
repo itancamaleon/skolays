@@ -57,11 +57,11 @@
             </div>
             <!-- Chats -->
             <section class="container_2">
-                <!-- Formulario para enviar nuevo mensaje -->
                 <div class="div_3">
                     <form id="chat-form">
                         <input type="hidden" id="destino" value="{{ destino.id if destino else '' }}">
                         <input type="text" id="mensaje" placeholder="Escribe tu mensaje" required class="input">
+                        <input type="file" id="imagen">
                         <button type="submit" class="btn">Enviar</button>
                     </form>
                 </div>
@@ -69,7 +69,13 @@
                 <div id="mensajes">
                     {% for mensaje in mensajes %}
                         <div class="mensaje mensaje-estilo {% if mensaje.sender_id == current_user.id %}mensaje_1{% else %}mensaje_2{% endif %}">
-                            {{ mensaje.content }}
+                            {% if mensaje.content %}
+                                <p>{{ mensaje.content }}</p>
+                            {% endif %}
+                            
+                            {% if mensaje.image_url %}
+                                <img src="{{ mensaje.image_url }}" alt="imagen enviada" style="max-width: 200px; display: block;">
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
@@ -97,37 +103,72 @@
 
         document.getElementById("chat-form").addEventListener("submit", function(e) {
             e.preventDefault();
-            const messageInput = document.getElementById("mensaje");
-            const message = messageInput.value;
-            if (message.trim() === "") return;
 
-            socket.emit('send_message', {
+            const messageInput = document.getElementById("mensaje");
+            const imageInput = document.getElementById("imagen");
+
+            const message = messageInput.value.trim();
+            const image = imageInput.files[0];
+
+            if (!message && !image) return; // nada que enviar
+
+            const data = {
                 sender_id: senderId,
                 receiver_id: receiverId,
                 message: message,
                 room: room
-            });
+            };
 
-            addMessage("Tú", message);
-            messageInput.value = "";
-            scrollToBottom();
-        });
+            if (image) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    data.image = reader.result;
+                    socket.emit('send_message', data);
 
-        socket.on("receive_message", function(data) {
-            if (String(data.sender_id) !== String(senderId)) {
-                addMessage(receiverName, data.message);
+                    // Mostrar el mensaje tú
+                    addMessage("Tú", message, URL.createObjectURL(image));
+                    messageInput.value = "";
+                    imageInput.value = "";
+                    scrollToBottom();
+                };
+                reader.readAsDataURL(image);
+            } else {
+                socket.emit('send_message', data);
+                addMessage("Tú", message);
+                messageInput.value = "";
                 scrollToBottom();
             }
         });
 
-        function addMessage(user, message) {
+        socket.on("receive_message", function(data) {
+            if (String(data.sender_id) !== String(senderId)) {
+                addMessage(receiverName, data.message, data.image || null);
+                scrollToBottom();
+            }
+        });
+
+        function addMessage(user, message, imageURL = null) {
             const container = document.getElementById("mensajes");
             const div = document.createElement("div");
 
             const isSender = user === "Tú";
             div.classList.add("mensaje-estilo", isSender ? "mensaje_1" : "mensaje_2");
 
-            div.textContent = message; // Solo el texto
+            if (message) {
+                const content = document.createElement("p");
+                content.textContent = message;
+                div.appendChild(content);
+            }
+
+            if (imageURL) {
+                const img = document.createElement("img");
+                img.src = imageURL;
+                img.style.maxWidth = "325px";
+                img.style.minWidth = "200px";
+                img.style.display = "block";
+                div.appendChild(img);
+            }
+
             container.appendChild(div);
         }
 

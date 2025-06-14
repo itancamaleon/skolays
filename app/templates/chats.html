@@ -180,6 +180,16 @@
             </div>
             </section>
         </main>
+        <div id="imagen-modal" class="modal">
+            <span id="cerrar-modal" class="cerrar">&times;</span>
+            <img id="imagen-ampliada" class="contenido-modal">
+            <div class="botones-modal">
+                <button id="boton-cerrar">Volver</button>
+                <a id="boton-descargar" href="#" download>
+                    <button>Descargar</button>
+                </a>
+            </div>
+        </div>
     </main>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
@@ -315,6 +325,24 @@
     document.getElementById("chat-form").addEventListener("submit", function () {
         document.getElementById("emoji-panel").style.display = "none";
     });
+
+    document.addEventListener("click", function(e) {
+    if (e.target.tagName === "IMG" && e.target.closest(".mensaje-estilo")) {
+        const modal = document.getElementById("imagen-modal");
+        const imagenAmpliada = document.getElementById("imagen-ampliada");
+        const botonDescargar = document.getElementById("boton-descargar");
+
+        imagenAmpliada.src = e.target.src;
+        botonDescargar.href = e.target.src;
+
+        modal.style.display = "flex";
+        }
+    });
+
+    document.getElementById("boton-cerrar").addEventListener("click", () => {
+        document.getElementById("imagen-modal").style.display = "none";
+    });
+
 </script>
 
 </body>

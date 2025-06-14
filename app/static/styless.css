@@ -385,8 +385,8 @@ li {
 
 #emoji-panel {
     position: absolute;
-    bottom: 60px; /* ajusta según el alto del input y padding */
-    left: 10px; /* ajústalo según el layout */
+    bottom: 60px;
+    left: 10px;
     background-color: rgb(51, 51, 51);
     border-radius: 10px;
     overflow-y: auto;
@@ -410,4 +410,44 @@ li {
 
 #emoji-panel .emoji:hover {
     transform: scale(1.3);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.contenido-modal {
+    max-width: 90%;
+    max-height: 80%;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.botones-modal {
+    display: flex;
+    gap: 15px;
+}
+
+.botones-modal button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #444;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.botones-modal button:hover {
+    background-color: #666;
 }

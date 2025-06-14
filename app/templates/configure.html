@@ -39,17 +39,20 @@
                 {% endfor %}
             </ul>
         </div>
-        <div id="formulario-grupo" style="display: none; background: #222; padding: 15px; border-radius: 10px; margin-top: 20px;">
-            <form method="POST" action="{{ url_for('main.crear_grupo') }}">
-                <label style="color: white;">Nombre del grupo:</label>
-                <input type="text" name="nombre_grupo" class="input" required>
+        <div id="formulario-grupo" style="display: none; background: #222; padding: 15px; border-radius: 10px; margin-top: 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.7); margin-bottom: 20px;">
+            <form class="form_1" method="POST" action="{{ url_for('main.crear_grupo') }}">
+                <section class="form">
+                    <label style="color: white;">Nombre del grupo:</label>
+                    <input type="text" name="nombre_grupo" class="input" required>
 
-                <label style="color: white;">Selecciona miembros:</label><br>
-                {% for amigo in current_user.friends %}
-                    <input type="checkbox" name="miembros" value="{{ amigo.id }}"> {{ amigo.username }}<br>
-                {% endfor %}
-                
-                <button type="submit" class="btn">Crear</button>
+                    <label style="color: white;">Selecciona miembros:</label>
+                    <div class="div_5">
+                        {% for amigo in current_user.friends %}
+                            <input style="margin-left: 10px; width: 20px;" type="checkbox" name="miembros" value="{{ amigo.id }}"> {{ amigo.username }}
+                        {% endfor %}
+                    </div>
+                </section>
+                    <button type="submit" class="btn">Crear</button>
             </form>
         </div>
 

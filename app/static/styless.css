@@ -173,6 +173,29 @@ form {
     justify-content: flex-end;
 }
 
+.form, .form_2 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.form_1{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.div_5 {
+    display: flex;
+    flex-direction: row-reverse;
+    background: #333;
+    color: white;
+    padding: 14px;
+    border-radius: 10px;
+}
+
 input[type="text"],
 input[type="email"],
 input[type="password"] {
@@ -252,23 +275,9 @@ input[type="password"]:focus {
     height: 37pc;
 }
 
-/*.container_2 {
-    margin: 10px 0px 0px 10px;
-    background-color: #121212;
-    display: flex;
-    flex-direction: column-reverse;
-    align-items: flex-start;
-}
-
 .mensaje_1 {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}*/
-
-.mensaje_1 {
-  clear: both;                 /* fuerza que el mensaje se muestre en una nueva línea */
-  float: right;                /* mensaje del usuario, a la derecha */
+  clear: both;      
+  float: right; 
   padding: 10px 15px;
   border-radius: 15px 15px 0 15px;
   max-width: 60%;
@@ -277,8 +286,8 @@ input[type="password"]:focus {
 }
 
 .mensaje_2 {
-  clear: both;                 /* fuerza nueva línea */
-  float: left;                 /* mensaje del amigo, a la izquierda */
+  clear: both;         
+  float: left;            
   padding: 10px 15px;
   border-radius: 15px 15px 15px 0;
   max-width: 60%;
@@ -374,22 +383,31 @@ li {
     max-height: 26pc;
 }
 
-#emoji-panel .emoji {
-    font-size: 24px;
-    cursor: pointer;
-    margin: 5px;
-    transition: transform 0.2s;
-}
-
 #emoji-panel {
-    display: block;
+    position: absolute;
+    bottom: 60px; /* ajusta según el alto del input y padding */
+    left: 10px; /* ajústalo según el layout */
     background-color: rgb(51, 51, 51);
     border-radius: 10px;
     overflow-y: auto;
-    width: 16pc;
-    height: 3pc;
+    width: 320px;
+    height: 150px;
+    padding: 10px;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+#emoji-panel .emoji {
+    font-size: 26px;
+    cursor: pointer;
+    margin: 6px;
+    transition: transform 0.2s;
+    display: inline-block;
 }
 
 #emoji-panel .emoji:hover {
-    transform: scale(1.2);
+    transform: scale(1.3);
 }

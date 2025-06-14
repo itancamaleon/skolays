@@ -67,7 +67,70 @@
             </div>
             <!-- Chats -->
             <section class="container_2">
-                <div class="div_3">
+                <div class="div_3" style="position: relative;">
+                    <div id="emoji-panel" style="display: none;">
+                        <span class="emoji">😀</span>
+                        <span class="emoji">😃</span>
+                        <span class="emoji">😄</span>
+                        <span class="emoji">😁</span>
+                        <span class="emoji">😆</span>
+                        <span class="emoji">😅</span>
+                        <span class="emoji">😂</span>
+                        <span class="emoji">🤣</span>
+                        <span class="emoji">😊</span>
+                        <span class="emoji">😇</span>
+                        <span class="emoji">😉</span>
+                        <span class="emoji">😌</span>
+                        <span class="emoji">😍</span>
+                        <span class="emoji">🥰</span>
+                        <span class="emoji">😘</span>
+                        <span class="emoji">😗</span>
+                        <span class="emoji">😙</span>
+                        <span class="emoji">😚</span>
+                        <span class="emoji">😋</span>
+                        <span class="emoji">😛</span>
+                        <span class="emoji">😝</span>
+                        <span class="emoji">😜</span>
+                        <span class="emoji">🤪</span>
+                        <span class="emoji">🤨</span>
+                        <span class="emoji">🧐</span>
+                        <span class="emoji">🤓</span>
+                        <span class="emoji">😎</span>
+                        <span class="emoji">😏</span>
+                        <span class="emoji">😒</span>
+                        <span class="emoji">😞</span>
+                        <span class="emoji">😔</span>
+                        <span class="emoji">😟</span>
+                        <span class="emoji">😕</span>
+                        <span class="emoji">🙁</span>
+                        <span class="emoji">☹️</span>
+                        <span class="emoji">😣</span>
+                        <span class="emoji">😖</span>
+                        <span class="emoji">😫</span>
+                        <span class="emoji">😩</span>
+                        <span class="emoji">😢</span>
+                        <span class="emoji">😭</span>
+                        <span class="emoji">🍎</span>
+                        <span class="emoji">🍊</span>
+                        <span class="emoji">🍌</span>
+                        <span class="emoji">🍉</span>
+                        <span class="emoji">🍇</span>
+                        <span class="emoji">🍓</span>
+                        <span class="emoji">🥝</span>
+                        <span class="emoji">🍍</span>
+                        <span class="emoji">🥥</span>
+                        <span class="emoji">🍒</span>
+                        <span class="emoji">😺</span>
+                        <span class="emoji">😸</span>
+                        <span class="emoji">😹</span>
+                        <span class="emoji">😻</span>
+                        <span class="emoji">😼</span>
+                        <span class="emoji">😽</span>
+                        <span class="emoji">🙀</span>
+                        <span class="emoji">😿</span>
+                        <span class="emoji">😾</span>
+                    </div>
+
                     <form id="chat-form">
                         {% if es_grupo %}
                             <input type="hidden" id="es_grupo" value="1">
@@ -81,74 +144,10 @@
                         <label class="btn" style="padding: 0px; display: flex; justify-content: center;" for="imagen">
                             <img style="width: 40px;" src="../static/img/camarera.png" alt="">
                         </label>
-                        <button type="button" id="emojis" class="btn" style="padding: 10px;" >😃</button>
-
-                        <div style="display: none;" id="emoji-panel">
-                            <span class="emoji">😀</span>
-                            <span class="emoji">😃</span>
-                            <span class="emoji">😄</span>
-                            <span class="emoji">😁</span>
-                            <span class="emoji">😆</span>
-                            <span class="emoji">😅</span>
-                            <span class="emoji">😂</span>
-                            <span class="emoji">🤣</span>
-                            <span class="emoji">😊</span>
-                            <span class="emoji">😇</span>
-                            <span class="emoji">😉</span>
-                            <span class="emoji">😌</span>
-                            <span class="emoji">😍</span>
-                            <span class="emoji">🥰</span>
-                            <span class="emoji">😘</span>
-                            <span class="emoji">😗</span>
-                            <span class="emoji">😙</span>
-                            <span class="emoji">😚</span>
-                            <span class="emoji">😋</span>
-                            <span class="emoji">😛</span>
-                            <span class="emoji">😝</span>
-                            <span class="emoji">😜</span>
-                            <span class="emoji">🤪</span>
-                            <span class="emoji">🤨</span>
-                            <span class="emoji">🧐</span>
-                            <span class="emoji">🤓</span>
-                            <span class="emoji">😎</span>
-                            <span class="emoji">😏</span>
-                            <span class="emoji">😒</span>
-                            <span class="emoji">😞</span>
-                            <span class="emoji">😔</span>
-                            <span class="emoji">😟</span>
-                            <span class="emoji">😕</span>
-                            <span class="emoji">🙁</span>
-                            <span class="emoji">☹️</span>
-                            <span class="emoji">😣</span>
-                            <span class="emoji">😖</span>
-                            <span class="emoji">😫</span>
-                            <span class="emoji">😩</span>
-                            <span class="emoji">😢</span>
-                            <span class="emoji">😭</span>
-                            <span class="emoji">🍎</span>
-                            <span class="emoji">🍊</span>
-                            <span class="emoji">🍌</span>
-                            <span class="emoji">🍉</span>
-                            <span class="emoji">🍇</span>
-                            <span class="emoji">🍓</span>
-                            <span class="emoji">🥝</span>
-                            <span class="emoji">🍍</span>
-                            <span class="emoji">🥥</span>
-                            <span class="emoji">🍒</span>
-                            <span class="emoji">😺</span>
-                            <span class="emoji">😸</span>
-                            <span class="emoji">😹</span>
-                            <span class="emoji">😻</span>
-                            <span class="emoji">😼</span>
-                            <span class="emoji">😽</span>
-                            <span class="emoji">🙀</span>
-                            <span class="emoji">😿</span>
-                            <span class="emoji">😾</span>
-                        </div>
+                        <button type="button" id="emojis" class="btn" style="padding: 10px;">😃</button>
 
                         <input type="hidden" id="destino" value="{{ destino.id if destino else '' }}">
                         <input type="text" id="mensaje" placeholder="Escribe tu mensaje" required class="input">
-                        
                         <button type="submit" class="btn">Enviar</button>
                     </form>
                 </div>
@@ -302,6 +301,19 @@
             mensajeInput.focus();
             document.getElementById("emoji-panel").style.display = "none";
         });
+    });
+    
+    document.addEventListener("click", function(e) {
+        const panel = document.getElementById("emoji-panel");
+        const toggleBtn = document.getElementById("emojis");
+
+        if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
+            panel.style.display = "none";
+        }
+    });
+
+    document.getElementById("chat-form").addEventListener("submit", function () {
+        document.getElementById("emoji-panel").style.display = "none";
     });
 </script>
 

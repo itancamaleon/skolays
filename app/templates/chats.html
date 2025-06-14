@@ -67,6 +67,32 @@
             </div>
             <!-- Chats -->
             <section class="container_2">
+                <div id="eso" class="div_4">
+                    {% if es_grupo %}
+                        <h2>{{ destino.name }}</h2>
+                    {% else %}
+                        <h2>{{ destino.username }}</h2>
+                    {% endif %}
+                </div>
+                <!-- Mensajes -->
+                <div id="mensajes">
+                    {% for mensaje in mensajes %}
+                        <div class="mensaje mensaje-estilo {% if mensaje.sender_id == current_user.id %}mensaje_1{% else %}mensaje_2{% endif %}">
+                            
+                            {% if mensaje.content %}
+                                {% if es_grupo and mensaje.sender_id != current_user.id %}
+                                    <p><strong>{{ mensaje.sender.username }}:</strong> {{ mensaje.content }}</p>
+                                {% else %}
+                                    <p>{{ mensaje.content }}</p>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if mensaje.image_url %}
+                                <img src="{{ mensaje.image_url }}" alt="imagen enviada" style="max-width: 200px; display: block;">
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
                 <div class="div_3" style="position: relative;">
                     <div id="emoji-panel" style="display: none;">
                         <span class="emoji">😀</span>
@@ -151,33 +177,6 @@
                         <button type="submit" class="btn">Enviar</button>
                     </form>
                 </div>
-                <!-- Mensajes -->
-                <div id="mensajes">
-                    {% for mensaje in mensajes %}
-                        <div class="mensaje mensaje-estilo {% if mensaje.sender_id == current_user.id %}mensaje_1{% else %}mensaje_2{% endif %}">
-                            
-                            {% if mensaje.content %}
-                                {% if es_grupo and mensaje.sender_id != current_user.id %}
-                                    <p><strong>{{ mensaje.sender.username }}:</strong> {{ mensaje.content }}</p>
-                                {% else %}
-                                    <p>{{ mensaje.content }}</p>
-                                {% endif %}
-                            {% endif %}
-
-                            {% if mensaje.image_url %}
-                                <img src="{{ mensaje.image_url }}" alt="imagen enviada" style="max-width: 200px; display: block;">
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-
-            <div class="div_4">
-                {% if es_grupo %}
-                    <h2>{{ destino.name }}</h2>
-                {% else %}
-                    <h2>{{ destino.username }}</h2>
-                {% endif %}
-            </div>
             </section>
         </main>
         <div id="imagen-modal" class="modal">
@@ -271,7 +270,6 @@
         if (message) {
             const content = document.createElement("p");
 
-            // Mostrar nombre solo en grupos y si no es el remitente
             if (esGrupo && !isSender) {
                 const strong = document.createElement("strong");
                 strong.textContent = `${user}: `;
@@ -342,6 +340,37 @@
     document.getElementById("boton-cerrar").addEventListener("click", () => {
         document.getElementById("imagen-modal").style.display = "none";
     });
+
+    let typingTimeout;
+
+    const typingElement = document.createElement("div");
+    typingElement.id = "typing-status";
+    typingElement.style.marginBottom = "5px";
+    typingElement.style.fontStyle = "italic";
+    typingElement.style.color = "gray";
+
+    const mensajesContainer = document.getElementById("eso");
+    mensajesContainer.parentNode.appendChild(typingElement);
+
+    document.getElementById("mensaje").addEventListener("input", () => {
+        socket.emit("typing", {
+            room: room,
+            sender_id: senderId,
+            es_grupo: document.getElementById("es_grupo").value === "1"
+        });
+    });
+
+    socket.on("user_typing", (data) => {
+        if (String(data.sender_id) !== String(senderId)) {
+            typingElement.textContent = `${data.username} está escribiendo...`;
+
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                typingElement.textContent = "";
+            }, 1000);
+        }
+    });
+
 
 </script>
 

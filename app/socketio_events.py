@@ -78,3 +78,19 @@ def handle_send_message(data):
             'title': f"Nuevo mensaje de {current_user.username}",
             'body': message if message else "📷 Imagen enviada"
         }, room=f"user_{receiver_id}")
+
+@socketio.on('typing')
+def handle_typing(data):
+    room = data['room']
+    sender_id = data['sender_id']
+    es_grupo = data.get('es_grupo', False)
+
+    from .models import User
+    user = db.session.get(User, sender_id)
+    if not user:
+        return
+
+    emit('user_typing', {
+        'username': user.username,
+        'sender_id': sender_id
+    }, room=room, include_self=False)

@@ -127,6 +127,12 @@ def chats():
             )
         ).order_by(Message.timestamp.asc()).all()
 
+        for m in mensajes:
+            if m.receiver_id == current_user.id and not m.is_read:
+                m.is_read = True
+
+        db.session.commit()
+
     return render_template('chats.html', mensajes=mensajes, destino=destino, grupos=grupos, es_grupo=es_grupo)
 
 @main.route('/aceptar_solicitud/<int:request_id>')

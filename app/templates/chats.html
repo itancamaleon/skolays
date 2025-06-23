@@ -80,11 +80,22 @@
                         <div class="mensaje mensaje-estilo {% if mensaje.sender_id == current_user.id %}mensaje_1{% else %}mensaje_2{% endif %}">
                             
                             {% if mensaje.content %}
-                                {% if es_grupo and mensaje.sender_id != current_user.id %}
-                                    <p><strong>{{ mensaje.sender.username }}:</strong> {{ mensaje.content }}</p>
-                                {% else %}
-                                    <p>{{ mensaje.content }}</p>
-                                {% endif %}
+                                <p>
+                                    {% if es_grupo and mensaje.sender_id != current_user.id %}
+                                        <strong>{{ mensaje.sender.username }}:</strong> 
+                                    {% endif %}
+                                    {{ mensaje.content }}
+                                    
+                                    {% if mensaje.sender_id == current_user.id %}
+                                        <span style="font-size: 12px; color: gray; margin-left: 10px;">
+                                            {% if mensaje.is_read %}
+                                                ✓✓
+                                            {% else %}
+                                                ✓
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                </p>
                             {% endif %}
 
                             {% if mensaje.image_url %}
@@ -154,7 +165,6 @@
                         <span class="emoji">😽</span>
                         <span class="emoji">🙀</span>
                         <span class="emoji">😿</span>
-                        <span class="emoji">😾</span>
                     </div>
 
                     <form id="chat-form">
@@ -196,6 +206,7 @@
 
     const senderId = "{{ current_user.id }}";
     const receiverId = "{{ destino.id }}";
+    const currentUserId = "{{ current_user.id }}";
     const receiverName = "{{ destino.username }}";
     const esGrupo = document.getElementById("es_grupo").value === "1";
     const grupoId = document.getElementById("grupo_id")?.value;
@@ -257,40 +268,56 @@
             const nombreMostrar = esGrupo ? data.sender_username : receiverName;
             addMessage(nombreMostrar, data.message, data.image || null);
             scrollToBottom();
+            
+            socket.emit('marcar_leido', {
+                room: room,
+                sender_id: currentUserId
+            });
         }
     });
 
-    function addMessage(user, message, imageURL = null) {
-        const container = document.getElementById("mensajes");
-        const div = document.createElement("div");
+function addMessage(user, message, imageURL = null) {
+    const container = document.getElementById("mensajes");
+    const div = document.createElement("div");
 
-        const isSender = user === "Tú";
-        div.classList.add("mensaje-estilo", isSender ? "mensaje_1" : "mensaje_2");
+    const isSender = user === "Tú";
+    div.classList.add("mensaje-estilo", isSender ? "mensaje_1" : "mensaje_2");
 
-        if (message) {
-            const content = document.createElement("p");
+    if (message) {
+        const content = document.createElement("p");
 
-            if (esGrupo && !isSender) {
-                const strong = document.createElement("strong");
-                strong.textContent = `${user}: `;
-                content.appendChild(strong);
-            }
-
-            content.appendChild(document.createTextNode(message));
-            div.appendChild(content);
+        if (esGrupo && !isSender) {
+            const strong = document.createElement("strong");
+            strong.textContent = `${user}: `;
+            content.appendChild(strong);
         }
 
-        if (imageURL) {
-            const img = document.createElement("img");
-            img.src = imageURL;
-            img.style.maxWidth = "325px";
-            img.style.minWidth = "200px";
-            img.style.display = "block";
-            div.appendChild(img);
+        content.appendChild(document.createTextNode(message));
+
+        if (isSender && !esGrupo) {
+            const vistoSpan = document.createElement("span");
+            vistoSpan.classList.add("estado-leido");  // ← para seleccionarlo después
+            vistoSpan.textContent = "✓";
+            vistoSpan.style.fontSize = "12px";
+            vistoSpan.style.color = "gray";
+            vistoSpan.style.marginLeft = "10px";
+            content.appendChild(vistoSpan);
         }
 
-        container.appendChild(div);
+        div.appendChild(content);
     }
+
+    if (imageURL) {
+        const img = document.createElement("img");
+        img.src = imageURL;
+        img.style.maxWidth = "325px";
+        img.style.minWidth = "200px";
+        img.style.display = "block";
+        div.appendChild(img);
+    }
+
+    container.appendChild(div);
+}
 
     document.addEventListener("DOMContentLoaded", function() {
         scrollToBottom();
@@ -369,6 +396,20 @@
                 typingElement.textContent = "";
             }, 1000);
         }
+    });
+
+    socket.emit('marcar_leido', {
+        room: room,
+        sender_id: currentUserId
+    });
+
+    socket.on('mensajes_leidos', (data) => {
+        const spans = document.querySelectorAll('.mensaje_1 span');
+        spans.forEach(span => {
+            if (span.textContent === "✓") {
+                span.textContent = "✓✓";
+            }
+        });
     });
 
 

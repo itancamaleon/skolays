@@ -94,3 +94,28 @@ def handle_typing(data):
         'username': user.username,
         'sender_id': sender_id
     }, room=room, include_self=False)
+
+@socketio.on('marcar_leido')
+def handle_marcar_leido(data):
+    room = data.get('room')
+    sender_id = data.get("sender_id")
+
+    if room and sender_id:
+        try:
+            partes = room.split("-")
+            if len(partes) == 2:
+                user_id_1, user_id_2 = int(partes[0]), int(partes[1])
+                receiver_id = user_id_2 if sender_id == user_id_1 else user_id_1
+
+                mensajes = Message.query.filter_by(sender_id=receiver_id, receiver_id=sender_id, leido=False).all()
+                for mensaje in mensajes:
+                    mensaje.leido = True
+                db.session.commit()
+
+                emit('mensajes_leidos', {
+                    'room': room,
+                    'sender_id': sender_id
+                }, room=room)
+
+        except Exception as e:
+            print(f"Error al marcar mensajes como leídos: {e}")

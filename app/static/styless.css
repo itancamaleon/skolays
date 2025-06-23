@@ -333,6 +333,7 @@ li {
     border-radius: 8px;
     background-color: #2e2d2d;
     color: white;
+    display: flex;
 }
 
 #mensajes {
@@ -527,7 +528,7 @@ li {
     margin-left: 10px;
     font-size: 14px;
     position: absolute;
-    margin-top: 27px;
+    margin-top: 30px;
 }
 
 .container_2 {

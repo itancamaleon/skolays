@@ -45,6 +45,8 @@ class Message(db.Model):
     receiver = db.relationship('User', foreign_keys=[receiver_id], back_populates='received_messages')
 
     group = db.relationship('Group', back_populates='messages') 
+    is_read = db.Column(db.Boolean, default=False)
+    leido = db.Column(db.Boolean, default=False)
 
 class FriendRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)

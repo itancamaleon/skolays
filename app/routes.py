@@ -1,16 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
-from .models import Message
-from .models import User
-from .models import User, FriendRequest
+from .models import User, Message, FriendRequest, Group, GroupMember
 from . import db
 from flask import request, jsonify, current_app
 from flask_login import current_user, login_required
 import os
 from werkzeug.utils import secure_filename
-from .models import Group, GroupMember, Message 
 from sqlalchemy import or_
+from itsdangerous import URLSafeTimedSerializer
+from .utils import send_verification_email
 
 main = Blueprint('main', __name__)
 
@@ -22,31 +21,56 @@ def index():
         return redirect(url_for('main.dashboard'))
     return render_template('index.html')
 
-@main.route('/register', methods=['POST'])
+@main.route('/register', methods=['GET', 'POST'])
 def register():
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password = request.form.get('password')
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
 
-    user_exists = User.query.filter((User.username == username) | (User.email == email)).first()
-    if user_exists:
-        flash('El usuario o correo ya está registrado.')
+        user_exists = User.query.filter((User.username == username) | (User.email == email)).first()
+        if user_exists:
+            flash('El usuario o correo ya está registrado.')
+            return redirect(url_for('main.index'))
+
+        existing_pins = {u.pin for u in User.query.all() if u.pin}
+        for i in range(1000):
+            new_pin = f"{i:03}"
+            if new_pin not in existing_pins:
+                break
+
+        hashed_password = generate_password_hash(password)
+        new_user = User(username=username, email=email, password=hashed_password, pin=new_pin)
+
+        serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        token = serializer.dumps(email, salt='email-confirm')
+        new_user.verification_token = token
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        send_verification_email(email, token)
+
+        flash("Registro exitoso. Revisa tu correo para verificar tu cuenta.")
         return redirect(url_for('main.index'))
 
-    existing_pins = {u.pin for u in User.query.all() if u.pin}
-    for i in range(1000):
-        new_pin = f"{i:03}"
-        if new_pin not in existing_pins:
-            break
+    return render_template('register.html')
 
-    hashed_password = generate_password_hash(password)
-    new_user = User(username=username, email=email, password=hashed_password, pin=new_pin)
-
-    db.session.add(new_user)
-    db.session.commit()
-
-    flash(f'Registro exitoso! Tu PIN es {new_pin}. Ya puedes iniciar sesión.')
-    return redirect(url_for('main.index'))
+@main.route('/verify/<token>')
+def verify_email(token):
+    serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(token, salt='email-confirm', max_age=3600)
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.is_verified = True
+            user.verification_token = None
+            db.session.commit()
+            flash("Correo verificado. Ya puedes iniciar sesión.")
+            return redirect(url_for('main.index'))
+    except:
+        flash("Token inválido o expirado.")
+        return redirect(url_for('main.index'))
 
 @main.route('/login', methods=['POST'])
 def login():
@@ -55,7 +79,15 @@ def login():
 
     user = User.query.filter((User.username == username_or_email) | (User.email == username_or_email)).first()
 
-    if not user or not check_password_hash(user.password, password):
+    if not user:
+        flash('Usuario o contraseña incorrectos.')
+        return redirect(url_for('main.index'))
+
+    if not user.is_verified:
+        flash("Debes verificar tu correo antes de iniciar sesión.")
+        return redirect(url_for('main.index'))
+
+    if not check_password_hash(user.password, password):
         flash('Usuario o contraseña incorrectos.')
         return redirect(url_for('main.index'))
 

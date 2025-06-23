@@ -24,8 +24,10 @@
                     <button type="submit" class="btn">Agregar</button>
                 </form>
                 <div class="div_2">
-                    <a href="{{ url_for('main.solicitudes') }}" class="btn">Solicitudes</a>
-                    <a href="{{ url_for('main.configure') }}" class="btn">Opciones</a>
+                    <div style="display: flex;">
+                        <a style="margin-left: 8px; padding: 4px;" href="{{ url_for('main.solicitudes') }}" class="btn"><img src="../static/img/solicitud.png" style="width: 30px;" alt=""></a>
+                        <a style="margin-left: 8px; padding: 4px;" href="{{ url_for('main.configure') }}" class="btn"><img src="../static/img/opciones.webp" style="width: 30px;" alt=""></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,7 +89,7 @@
                                     {{ mensaje.content }}
                                     
                                     {% if mensaje.sender_id == current_user.id %}
-                                        <span style="font-size: 12px; color: gray; margin-left: 10px;">
+                                        <span style="font-size: 12px; color: gray; margin-left: 2px;">
                                             {% if mensaje.is_read %}
                                                 ✓✓
                                             {% else %}
@@ -296,11 +298,11 @@ function addMessage(user, message, imageURL = null) {
 
         if (isSender && !esGrupo) {
             const vistoSpan = document.createElement("span");
-            vistoSpan.classList.add("estado-leido");  // ← para seleccionarlo después
+            vistoSpan.classList.add("estado-leido");
             vistoSpan.textContent = "✓";
             vistoSpan.style.fontSize = "12px";
             vistoSpan.style.color = "gray";
-            vistoSpan.style.marginLeft = "10px";
+            vistoSpan.style.marginLeft = "2px";
             content.appendChild(vistoSpan);
         }
 

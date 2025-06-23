@@ -9,9 +9,9 @@
 <body>
     <div class="container_4" style="margin-top: 20px;">
         <div class="div_1">
-            <img src="{{ url_for('static', filename=current_user.profile_picture_url) }}" alt="Foto de perfil" width="100" class="foto_de_perfil">
+            <img style="width: 80px; height: 80px;" src="{{ url_for('static', filename=current_user.profile_picture_url) }}" alt="Foto de perfil" width="100" class="foto_de_perfil">
             <input type="file" id="cambiar-foto" style="display: none;">
-            <div class="div_2">
+            <div style="margin-left: 30px;">
                 <h2 style="color: white;">{{ current_user.username }}</h2>
                 <p>PIN: {{ current_user.pin }}</p>
                 <button class="button" onclick="document.getElementById('cambiar-foto').click()">Cambiar foto</button>

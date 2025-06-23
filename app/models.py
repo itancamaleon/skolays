@@ -14,6 +14,8 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(150))
     pin = db.Column(db.String(3), unique=True)
     image_url = db.Column(db.String(255), nullable=True)
+    verification_token = db.Column(db.String(255), nullable=True)
+    is_verified = db.Column(db.Boolean, default=False)
 
     profile_picture_url = db.Column(db.String(255), default='/static/foto.png')
 

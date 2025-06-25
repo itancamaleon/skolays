@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styless.css') }}" />
 </head>
 <body>
+    <div id="pantalla-carga">
+        <div class="spinner"></div>
+        <p>Cargando chats...</p>
+    </div>
     <main class="main_1">
         <div class="container">
             <h1>Skölays</h1>
@@ -204,6 +208,14 @@
     </main>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
+    window.onload = function() {
+        const pantalla = document.getElementById('pantalla-carga');
+        pantalla.style.transition = 'opacity 0.1s ease';
+        pantalla.style.opacity = 0;
+        setTimeout(() => {
+        pantalla.style.display = 'none';
+        }, 500);
+    };
     const socket = io();
 
     const senderId = "{{ current_user.id }}";
